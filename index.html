@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lançamentos de Livros</title>
+<style>
+:root {
+  --bg: #f2f5f4; --card: #ffffff; --tx: #16201f; --mu: #5d6d6a; --ac: #1d6b66; 
+  --bd: #d6dedc; --chip: #e4ebe9; --accent-hover: #154e4a;
+  color-scheme: light; box-sizing: border-box; 
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1514; --card: #172120; --tx: #e8efed; --mu: #9bb0ac; --ac: #6fcfc4; 
+    --bd: #273634; --chip: #1f2c2a; --accent-hover: #8ae0d6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1514; --card: #172120; --tx: #e8efed; --mu: #9bb0ac; --ac: #6fcfc4; 
+  --bd: #273634; --chip: #1f2c2a; --accent-hover: #8ae0d6;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; background: var(--bg); color: var(--tx); font: 16px/1.4 Georgia, serif; max-width: 680px; margin-inline: auto; padding: 0 14px 40px; }
+h1 { font-size: 1.6rem; margin: 16px 0 2px; }
+.sub { color: var(--mu); font: 0.85rem system-ui, sans-serif; margin: 0 0 12px; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); background: var(--bg); padding: 8px 0; z-index: 5; }
+input, select { width: 100%; font: 1rem system-ui, sans-serif; padding: 10px 12px; border: 1px solid var(--bd); border-radius: 10px; background: var(--card); color: var(--tx); }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0 4px; scrollbar-width: none; }
+.chip { flex: none; font: 0.85rem system-ui, sans-serif; padding: 7px 12px; border-radius: 99px; border: 1px solid var(--bd); background: var(--chip); color: var(--tx); cursor: pointer; }
+.chip.on { background: var(--ac); border-color: var(--ac); color: #fff; }
+.row { display: flex; gap: 8px; margin-top: 8px; }
+.row > * { flex: 1; }
+.cnt { color: var(--mu); font: 0.8rem system-ui, sans-serif; margin: 10px 2px; }
+h2 { font-size: 1rem; margin: 18px 2px 8px; color: var(--ac); text-transform: uppercase; letter-spacing: 0.06em; font-family: system-ui, sans-serif; }
+.card { display: flex; gap: 12px; background: var(--card); border: 1px solid var(--bd); border-radius: 12px; padding: 12px; margin-bottom: 10px; position: relative; }
+.card .b { flex: 1; min-width: 0; }
+.t { font-weight: 700; overflow-wrap: anywhere; font-size: 1.05rem; }
+.a { color: var(--mu); font: 0.88rem system-ui, sans-serif; }
+.m { font: 0.78rem system-ui, sans-serif; color: var(--mu); margin-top: 4px; }
+.source-tag { display: inline-block; font: 500 0.72rem system-ui, sans-serif; background: var(--chip); color: var(--ac); padding: 2px 8px; border-radius: 4px; margin-top: 4px; border: 1px solid var(--bd); }
+.kw { font: 600 0.76rem/1.35 system-ui, sans-serif; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 6px; color: var(--ac); }
+.h { background: none; border: 0; font-size: 1.4rem; color: var(--ac); cursor: pointer; align-self: flex-start; padding: 0 4px; line-height: 1; }
+.empty { text-align: center; color: var(--mu); padding: 30px 0; font-family: system-ui, sans-serif; }
+.src { color: var(--mu); font: 0.75rem system-ui, sans-serif; margin-top: 24px; line-height: 1.5; border-top: 1px solid var(--bd); padding-top: 12px; }
+.tabs { display: flex; gap: 8px; margin-bottom: 8px; }
+.why { background: var(--chip); border-radius: 10px; padding: 10px 12px; font: 0.82rem system-ui, sans-serif; color: var(--mu); margin: 0 0 8px; }
+.rs { font: 0.78rem system-ui, sans-serif; color: var(--ac); margin-top: 6px; font-weight: 500; }
+.cvw { width: 72px; height: 108px; flex: none; border-radius: 6px; background: var(--chip); overflow: hidden; display: flex; align-items: center; justify-content: center; color: var(--mu); font: bold 0.9rem system-ui, sans-serif; text-align: center; border: 1px solid var(--bd); }
+.cvw img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.info { font: 0.78rem system-ui, sans-serif; color: var(--mu); margin-top: 6px; }
+.links { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.btn-link { font: 0.75rem system-ui, sans-serif; text-decoration: none; padding: 4px 10px; border-radius: 6px; background: var(--chip); color: var(--tx); border: 1px solid var(--bd); font-weight: 500; }
+.btn-link:hover { background: var(--ac); color: #fff; border-color: var(--ac); }
+.feedback { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; align-items:center; }
+.feedback label { font: .72rem system-ui,sans-serif; color:var(--mu); }
+.feedback select { width:auto; min-width:150px; padding:6px 8px; font-size:.78rem; }
+.tools { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px; }
+.tools button,.tools label { font: .8rem system-ui,sans-serif; padding:7px 10px; border:1px solid var(--bd); border-radius:8px; background:var(--chip); color:var(--tx); cursor:pointer; }
+.tools input[type=file] { display:none; }
+.profile-note { font: .8rem system-ui,sans-serif; color:var(--mu); margin:6px 2px 10px; }
+.match { font: .76rem system-ui,sans-serif; color:var(--ac); margin-top:5px; }
+.layers { margin-top:8px; font: 700 .76rem/1.45 system-ui,sans-serif; letter-spacing:.045em; text-transform:uppercase; color:var(--ac); }
+.layer { color:var(--tx); }
+.layer .unknown { opacity:.75; font-style:italic; text-transform:none; font-weight:400; letter-spacing:0; }
+.profile-stats { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+.profile-stats span { background:var(--chip); border:1px solid var(--bd); padding:4px 7px; border-radius:7px; font: .72rem system-ui,sans-serif; color:var(--mu); }
+</style>
+</head>
+<body>
+<h1>Lançamentos de Livros</h1>
+<p class="sub">Lançamentos em inglês, curadoria de editoras e recomendações baseadas no seu histórico de leitura.</p>
+<div class="tabs" id="tabs">
+  <button class="chip on" data-tab="all">Todos os Lançamentos</button>
+  <button class="chip" data-tab="you">Para você ★</button>
+</div>
+<div class="why" id="why" hidden>Recomendações personalizadas usando seu histórico de leitura e o feedback que você der aqui.</div>
+<div class="tools">
+  <label for="historyFile">Importar histórico CSV</label><input id="historyFile" type="file" accept=".csv,text/csv">
+  <button id="clearHistory" type="button">Limpar perfil importado</button>
+  <button id="exportFeedback" type="button">Exportar minhas marcações</button>
+</div>
+<div class="profile-note" id="profileNote">Perfil de leitura: importe seu CSV do Goodreads. O sistema cruza autor (40%), gênero (25%) e keywords (35%) quando esses dados existem no CSV. Descrições em inglês são geradas apenas a partir das tags do catálogo.</div>
+<div class="bar">
+  <input id="q" type="search" placeholder="Buscar autor, título ou tema..." autocomplete="off">
+  <div class="chips" id="chips"></div>
+  <div class="row">
+    <select id="sort">
+      <option value="date">Ordenar por data</option>
+      <option value="genre">Agrupar por gênero</option>
+      <option value="title">Ordenar por título</option>
+    </select>
+    <select id="saved">
+      <option value="0">Todos os livros</option>
+      <option value="1">Só favoritos (♥)</option>
+    </select>
+    <select id="interestFilter">
+      <option value="">Qualquer interesse</option>
+      <option value="interested">Tenho interesse</option>
+      <option value="maybe">Talvez</option>
+      <option value="not-interested">Não tenho interesse</option>
+      <option value="unrated">Ainda sem marcação</option>
+    </select>
+    <select id="mon">
+      <option value="">Todos os meses</option>
+      <option value="10">Outubro 2026</option>
+      <option value="11">Novembro 2026</option>
+    </select>
+  </div>
+</div>
+<div class="cnt" id="cnt"></div>
+<div id="list"></div>
+<p class="src">
+  <strong>Fontes registradas:</strong> calendários/catálogos de editoras e bases bibliográficas. BookTube é referência complementar ocasional: booksandlala, cari can read, Uncarley, Syd Bookworm, Gabbie Reads, Emmiereads e Megwithbooks.<br>
+  <strong>Capas:</strong> Google Books e Open Library. <br><strong>Privacidade:</strong> histórico e marcações ficam no armazenamento local deste navegador; exporte as marcações para transferi-las para outro dispositivo.
+</p>
+
+<script>
+// Estrutura: [Título, Autor, Gênero, Data, Editora, Tags, Fonte]
+const B = [
+  ["The Witch","Freida McFadden","Thriller","2026-10-20","Poisoned Pen Press","thriller|witchcraft|haunted house","Goodreads (Outubro/2026)"],
+  ["The Gift","Freida McFadden","Thriller","2026-11-03","Poisoned Pen Press","holiday thriller|short story|suspense","Goodreads (Novembro/2026)"],
+  ["A Court of Splintered Harmony","Sarah J. Maas","Fantasia","2026-10-27","Bloomsbury","acotar|fae|romantasy|series","Goodreads (Destaques da Semana)"],
+  ["Partita","Barbara Kingsolver","Literária","2026-10-20","Harper","music|memories|pulitzer author","Goodreads (Lançamentos da Semana)"],
+  ["Mazywood","Tananarive Due","Terror","2026-11-03","Saga Press","horror|hollywood 1920s|dog|family legacy","YouTube: booksandlala (Most Anticipated)"],
+  ["Japanese Gothic","Kylie Lee Baker","Terror","2026-10-13","Inkyard Press","gothic|japan|supernatural|dark","YouTube: booksandlala / Goodreads"],
+  ["Blacktail","Scott Hawkins","Fantasia","2026-10-06","Crown","weird fiction|wolf|mount char author","YouTube: cari can read (Wrap-up)"],
+  ["Fishbone Cinderella","Elizabeth Lim","Histórica","2026-10-06","Knopf YA","cinderella retelling|hong kong|wwii","YouTube: cari can read (Book Club)"],
+  ["On the Calculation of Volume (Book V)","Solvej Balle","Ficção científica","2026-11-17","New Directions","time loop|groundhog day|translated","Goodreads (Próximos Lançamentos)"],
+  ["Warm Bodies","John Marrs","Thriller","2026-11-01","Amazon Original Stories","kindle","Book Riot / Editoras"],
+  ["Mirror Image","Lauren E. Rico","Thriller","2026-11-01","Thomas & Mercer","kindle","Book Riot / Editoras"],
+  ["The Woman I’ve Become","Debra Webb","Thriller","2026-11-01","Thomas & Mercer","kindle","Book Riot / Editoras"],
+  ["Cherry","Rose Wilding","Thriller","2026-11-03","Minotaur Books","hardcover","The Bookish Elf (Novembro)"],
+  ["Cold Sunset: A Gabriel Dax Novel","William Boyd","Thriller","2026-11-03","Atlantic Crime","series espionage","The Bookish Elf (Novembro)"],
+  ["When They Find Me","Carter Wilson","Thriller","2026-11-10","Poisoned Pen Press","paperback","The Bookish Elf (Novembro)"],
+  ["Before I Disappear","Cate Quinn","Thriller","2026-11-10","Sourcebooks Landmark","paperback","The Bookish Elf (Novembro)"],
+  ["All In","David Baldacci","Thriller","2026-11-10","Grand Central Publishing","hardcover","The Bookish Elf (Novembro)"],
+  ["Mr. Disappear","Virginia Trench","Thriller","2026-11-10","Crown","paperback","The Bookish Elf (Novembro)"],
+  ["All the Little Secrets","May Cobb","Thriller","2026-11-17","Sourcebooks Landmark","hardcover","The Bookish Elf (Novembro)"],
+  ["Dangerous Impulses","Jennifer Lynn Barnes","Mistério","2026-11-03","Little, Brown (YA)","ya","The Bookish Elf (Novembro)"],
+  ["The Heights","Ian Rankin","Mistério","2026-11-03","Cardinal","crime police","The Bookish Elf (Novembro)"],
+  ["Wolves of Summer","Donna Freitas","Mistério","2026-11-03","Soho Crime","crime","The Bookish Elf (Novembro)"],
+  ["This Jury Is Guilty","Laurie Blake","Mistério","2026-11-03","Sourcebooks Landmark","trial crime","The Bookish Elf (Novembro)"],
+  ["Numb Were the Beadsman’s Fingers","Alan Bradley","Mistério","2026-11-03","hardcover","crime","The Bookish Elf (Novembro)"],
+  ["Midnight in the House of Commons","Charles Finch","Mistério","2026-11-03","Minotaur Books","politics","The Bookish Elf (Novembro)"],
+  ["The Lost Souls of Saint Oda’s","Jess Armstrong","Mistério","2026-11-03","Minotaur Books","crime","The Bookish Elf (Novembro)"],
+  ["Bad Company","Sara Paretsky","Mistério","2026-11-10","Minotaur Books","crime detective","The Bookish Elf (Novembro)"],
+  ["The Body in the Bath","Ragnar Jónasson","Mistério","2026-11-10","Minotaur Books","crime nordic","The Bookish Elf (Novembro)"],
+  ["Split Second: Thirty-Two Switcheroo","Janet Evanovich","Mistério","2026-11-10","Atria Books","series","The Bookish Elf (Novembro)"],
+  ["The Riddle Maker","Bruce Borgos","Mistério","2026-11-17","Minotaur Books","crime","The Bookish Elf (Novembro)"],
+  ["The Sleeper","Holly Seddon","Mistério","2026-11-17","Atria","crime","The Bookish Elf (Novembro)"],
+  ["To Crown It All","Rhys Bowen","Mistério","2026-11-17","Berkley","series","The Bookish Elf (Novembro)"],
+  ["The Collateral Heart","Jeffery Deaver","Mistério","2026-11-17","G.P. Putnam’s Sons","crime","The Bookish Elf (Novembro)"],
+  ["The Murder Trial","James Patterson, Nancy Allen","Mistério","2026-11-23","Little, Brown","trial crime","The Bookish Elf (Novembro)"],
+  ["There Used to Be People Here","Kennedy Cole","Terror","2026-11-03","Berkley","horror","The Bookish Elf (Novembro)"],
+  ["Clear Water","Gabrielle Lucille Fuentes","Terror","2026-11-03","Flatiron Books","horror","The Bookish Elf (Novembro)"],
+  ["Until the Last Light Goes Out","Courtney Gould","Terror","2026-11-10","Wednesday Books","horror","The Bookish Elf (Novembro)"],
+  ["Revenge Plot","Stephanie Wrobel","Terror","2026-11-10","Berkley","horror","The Bookish Elf (Novembro)"],
+  ["Pinfeathers","Christina Henry","Terror","2026-11-17","Berkley","horror","The Bookish Elf (Novembro)"],
+  ["Monsters of Ohio","John Scalzi","Ficção científica","2026-11-03","Tor Books","sci-fi","The Bookish Elf (Novembro)"],
+  ["Everything Happens So Much","Andrew H. Murray","Ficção científica","2026-11-10","Little, Brown","sci-fi","The Bookish Elf (Novembro)"],
+  ["All the Beastly Things","Eilish Quin","Ficção científica","2026-11-17","Atria Books","sci-fi","The Bookish Elf (Novembro)"],
+  ["Deadlock","Chloe Gong","Ficção científica","2026-11-17","McElderry Books","sci-fi ya","The Bookish Elf (Novembro)"],
+  ["Madeline McKnight Signs Off","Evan Brooke","Literária","2026-11-03","Atria Books","novel","The Bookish Elf (Novembro)"],
+  ["A Glacier’s Guide to Dying","Michelle Porter","Literária","2026-11-03","Algonquin Books","novel","The Bookish Elf (Novembro)"],
+  ["The Squatters","Saba Brelvi","Literária","2026-11-10","The Dial Press","novel","The Bookish Elf (Novembro)"],
+  ["No Such Thing as Monday","Siân Hughes","Literária","2026-11-10","Henry Holt","novel","The Bookish Elf (Novembro)"],
+  ["Don’t Stop Snowing","Gabriel Bump","Literária","2026-11-10","Algonquin Books","novel","The Bookish Elf (Novembro)"],
+  ["This Impossible Life","Chinelo Okparanta","Literária","2026-11-10","Mariner Books","novel","The Bookish Elf (Novembro)"],
+  ["The Key Biscayne Affair","Xita Rubert","Literária","2026-11-10","Ecco","novel","The Bookish Elf (Novembro)"],
+  ["Uprising","Tahmima Anam","Literária","2026-11-17","Scribner","novel","The Bookish Elf (Novembro)"],
+  ["Every Goodbye Ain’t Gone","Dana Renee Green","Literária","2026-11-17","Simon & Schuster","novel","The Bookish Elf (Novembro)"],
+  ["Tiger’s Mouth","Lucy Tan","Literária","2026-11-17","Ballantine Books","novel","The Bookish Elf (Novembro)"],
+  ["Nanny Nanny","K. Chiucarello","Literária","2026-11-17","Ecco","novel","The Bookish Elf (Novembro)"],
+  ["Peregrine Hill","Nina de Gramont","Histórica","2026-11-10","Simon & Schuster","historical","The Bookish Elf (Novembro)"],
+  ["The Unfinished Work","Jeff Shaara","Histórica","2026-11-10","St. Martin’s Press","war history","The Bookish Elf (Novembro)"],
+  ["Hecate Cavendish and the Angel of Death","Paula Brackston","Histórica","2026-11-10","St. Martin’s Press","historical","The Bookish Elf (Novembro)"],
+  ["The Last Prince of Florence","Zoe Sivak","Histórica","2026-11-17","Berkley","italy","The Bookish Elf (Novembro)"],
+  ["Jane Austen’s The Watsons","Claudia Gray, Jane Austen","Histórica","2026-11-17","Vintage","austen classic","The Bookish Elf (Novembro)"],
+  ["Is It Too Late to Make a Run for It?","Judi Dench","Não ficção","2026-11-03","St. Martin’s Press","memoir","The Bookish Elf (Novembro)"],
+  ["How to Be Less Useful: The Joy of Inefficiency","Priyanka Mattoo","Não ficção","2026-11-03","Knopf","self-help","The Bookish Elf (Novembro)"],
+  ["Just a Shot Away: Martin Scorsese’s Life in Film","Mark Binelli","Não ficção","2026-11-03","Metropolitan Books","cinema biography","The Bookish Elf (Novembro)"],
+  ["America Obscura","Atlas Obscura, Dylan Thuras","Não ficção","2026-11-10","Ten Speed Press","travel guide","The Bookish Elf (Novembro)"],
+  ["Take My Word for It: A Memoir","LeVar Burton","Não ficção","2026-11-10","Random House","memoir","The Bookish Elf (Novembro)"],
+  ["The Last Leaf","Willie Nelson","Não ficção","2026-11-10","Penguin Press","music creativity","The Bookish Elf (Novembro)"],
+  ["The Girl’s Guide to Guts","Chloe Melas, Judy Batalion","Não ficção","2026-11-10","The Dial Press","health","The Bookish Elf (Novembro)"],
+  ["Almost Animal: A Memoir","Amy Irvine","Não ficção","2026-11-10","Spiegel & Grau","memoir nature","The Bookish Elf (Novembro)"],
+  ["And If I Die Before I Wake: A Memoir","George M. Johnson","Não ficção","2026-11-10","FSG (BYR)","memoir ya","The Bookish Elf (Novembro)"],
+  ["The East Wing","Azadeh Moaveni","Não ficção","2026-11-17","St. Martin’s Press","politics history first ladies","The Bookish Elf (Novembro)"]
+];
+
+const E = [
+  ["The Last King of Faerie","Cassandra Clare","Fantasia","2026-11-03","Knopf Books for Young Readers","fantasy","Goodreads Anticipated"],
+  ["Murmuration","T.J. Klune","Edição nova","2026-11-17","Capa dura nova (1ª edição em 28/10)","hardcover","Book Riot"]
+];
+
+const F=(t,a,d,p)=>[t,a,"Fantasia","2026-11-"+d,p,"fantasy","Publisher Catalog"];
+const R=(t,a,d,p)=>[t,a,"Romance","2026-11-"+d,p,"romance","Publisher Catalog"];
+
+const X=[
+  F("Defy the Dusk","Danielle L. Jensen","03","Del Rey"),F("The Wolves of War","John Gwynne","03","Orbit"),
+  F("Captive Traitor King","Brigid Kemmerer","03","Avon"),F("Twelve Dark Hours","Amber Hamilton","03","Bloomsbury YA"),
+  F("Fallen Beauty","Astrid Scholte","03","Wednesday Books"),F("A Conspiracy of Charming Monsters","Holly Black","03","Alvina Ling Books"),
+  F("Lightwing","Caroline Peckham, Susanne Valenti","03","King’s Hollow"),F("Drown the Bones","Alexandra Kennington","03","Berkley XO"),
+  F("A Glimmer of Death","Laurell K. Hamilton","03","Berkley"),F("Sharpest Court","Kiera Azar","03","Storytide"),
+  F("East of Envy","Nikki St. Crowe","03","Bramble"),F("Her Rising Flame","Clíodhna O’Sullivan","03","Viking"),
+  F("This Knight Topples Empires","Ry Herman","03","Dial Press"),F("The Queen of the Spirit Woods","Sharon Choe","03","Atheneum"),
+  F("This Wretched Alchemy","Tina Mars","10","Saturday Books"),F("Prudence Marsh Is Not a Nobody Anymore","Emily Krempholtz","10","Ace"),
+  F("Blood of Silver","Allie Nguyen","10","Simon & Schuster"),F("Bones of Jade, Flesh Like Ice","Gracie Marsden","10","Viking"),
+  F("The Trial of Magdalena Overmorrow","Caitríona Moran","10","G.P. Putnam’s Sons"),F("The Siren’s Kiss","Leslie Vedder","10","Abrams / Amulet"),
+  F("Witches of Questionable Intent","Jenn McKinlay","10","Ace"),F("Rely on Death","Rinn Marrell","10","Independente"),
+  F("Embers of Magic","Catherine Bakewell","10","HarperCollins"),F("The Last Dragon Queen","Sylvia Mercedes","10","Ace"),
+  F("Shadow Slave, Book 1: Child of Shadows","Guiltythree","10","AETHON"),F("The Thorns We Wear Inside","Amy Avery","10","DAW"),
+  F("The Drakon King","Terry J. Benton-Walker","10","Bramble"),F("The Sign of the Raven","Pippa Dunn","10","Viking"),
+  F("Fall for a Fairytale","Isabelle Taylor","10","Dell"),F("Girls Walking with Wolves","Jenna Baner","10","Page Street YA"),
+  F("Critical Role: The Mighty Nein, Children of Empire","Nibedita Sen","10","Random House Worlds"),F("A Destiny So Cruel","Amanda Foody, C. L. Herman","10","Tor Teen"),
+  F("Monster You Made","Nagisa Rei Gwynne","16","Midnight Plumeria Books"),
+  F("Birth of the Witch","Nora Roberts","17","St. Martin’s Press"),F("The Wrath Gods Reap","Abigail Owen","17","Entangled: Red Tower"),
+  F("Soul Sworn","Kate Dylan","17","Delacorte Press"),F("Cursekeeper","Alexandra Christo","17","Atria Books"),
+  F("A World Apart","Meghan Nesmith","17","Aria"),F("An Edge Sharp Enough","Jesse Q. Sutanto","17","Harper Voyager"),
+  F("This Wild Wanting","Sophie Gonzales","17","Wednesday Books"),F("Dreams of Ruin","Emma Noyes","17","Wednesday Books"),
+  F("Thunderstruck","Lissa Layland","17","Avon"),F("Blade of Two Faces","Blake Blessing","17","Bramble"),
+  F("A Thief to Die For","Melissa Poett","17","HarperCollins"),F("Mr. Mendlebee’s Pandimensional Literary Repository [and Yarn]","Rebecca McKee","17","G.P. Putnam’s Sons"),
+  F("Love, Witches, and Wahala","Christine Cowan","17","Orbit"),F("The Seventh Painted Bride","Oath Sterling","20","Independente"),
+  F("The Fall of the Crowned King","Amber V. Nicole","24","Kensington"),F("The Call of Crowns","Chinaza Bado","24","Harper Voyager"),
+  F("Vine of Hearts","Julie Soto","26","Magpie"),
+  R("The Apparent Trap","Ali Rosen","01","Montlake"),R("The Game","Sadie Kincaid","03","MIRA"),
+  R("To Vex & To Hex","Neena Noon","03","St. Martin’s Griffin"),R("Cut to the Ending","Maria Millage","03","Little, Brown"),
+  R("Claimed by the Orc King","Roxy Taylor","03","Bramble"),R("Sunflower Season","Danica Nava","03","Berkley"),
+  R("First Love Last Love","Adele Griffin","03","Sourcebooks Landmark"),R("Snowed In","Navessa Allen","03","Forever"),
+  R("Wanted","Paisley Hope","03","Dell"),R("Final Cut","Amy James","03","Independente"),
+  R("Trouble: A Hockey Romance","Brittanee Nicole","03","Podium"),R("Rebel Darling","Alexandra Moody","05","Electric Monkey"),
+  R("The Secrets of Clarence Manor","Devney Perry","10","Bloom Books"),R("Swipe Bite","Alexandra Vasti","10","Berkley"),
+  R("You, Me, & the Conspiracy","Emma Barry","10","Atria Books"),R("Crash into You","Simone Soltani","10","Berkley"),
+  R("Loathed Love","Krista Ritchie, Becca Ritchie","10","Bloom Books"),R("Hate and Other Acts of Fiction","Megan Oliver","10","Berkley"),
+  R("Too Cold for Comfort","Nisha J. Tuli","10","Forever"),R("Not the Way it Ends","Allie Samberts","10","Page & Vine"),
+  R("The Fake Fling","Cali Melle","13","Kindle"),R("Winter Flame","Carrie Ann Ryan","16","Independente"),
+  R("Peculiar Stars","Rebecca Yarros","17","Montlake"),R("Beneath a Midnight Moon","Catherine Cowles","17","Bloom Books"),
+  R("Alma Vampires","Elena Armas","17","Berkley"),R("The Monster Hunter’s Librarian","Lauren Connolly","17","Berkley"),
+  R("By the Light of the Stars","Emily Gray","17","Ace"),R("Two Can Play That Game","Zakiya N. Jamal","17","Berkley"),
+  R("Engaged to the Enemy","Lucy Smoke","17","Forever"),R("Saddles & Snowfall","Elliott Rose","24","Kensington")
+];
+
+const T=(t,a,d,p,k)=>[t,a,"Terror","2026-10-"+d,p,k,"Publisher Catalog"];
+const O=[
+  T("Public Access Afterworld","Jane Schoenbrun","27","Hogarth","horror|sci-fi|coming-of-age|pirate TV network|conspiracy|first of a trilogy"),
+  T("Rottenheart","Kat Dunn","13","Zando","Hamlet retelling|sapphic|vengeful ghost|cruel stepmother|best friends"),
+  T("Quaint Folk","Bitter Karella","06","—","satirical folk horror|dark humor"),
+  T("Other Worlds Than These","Stephen King, Peter Straub","06","—","King + Straub"),
+  T("Look What the Cat Dragged In","Jason Rekulak","13","—","fully illustrated|cat with a secret|high concept"),
+  T("Unspeakable Things","Elizabeth Hand","13","—","trans tribute to New French Extremity|1970s grindhouse"),
+  T("Tatratea","Alex Woodroe","20","—","eco-horror"),
+  T("A Compendium of Supernatural Entities Found in the Government Girls Higher Secondary School","Kuzhali Manickavel","00","—","weird horror|school|supernatural creatures|outcast girl|Tamil Nadu|similar to Bunny"),
+  T("The Finalist","Faith Gladwin","00","—","ballet|audition|secluded manor|murderous house|rivalry"),
+  T("Find Me Where It Ends","Cassandra Khaw","00","—","novella|black dog|death at the door|family curse|exhaustion"),
+  T("The House Built on Alligator Bones","Sophia Huneycutt","00","—","alligator farm|inheritance|ancestral curse|family secrets|Florida"),
+  T("It Looks Like You in the Dark","Mathilda Zeller","00","—","Indigenous horror|Inupiat village|missing sister|shapeshifting creature|first in a series"),
+  T("Night of the Mallrats","Nicolina Torres","00","—","abandoned mall|back to 1995|missing friend|reunion|nostalgia"),
+  T("Off the Reservation","Stephen Graham Jones","00","—","Indigenous horror|follow-up to The Only Good Indians|road trip|stolen bones|released evil"),
+  T("Bruja’s Nest","Brenda Latorre","00","—","body horror|monstrous motherhood"),
+  T("House Haunters","KC Jones","00","—","reality TV|ghost hunting show|goes wrong"),
+  T("Possession Island","Sarah McCarry","00","—","queer Gothic thriller|remote island|Pacific Northwest"),
+  T("Solace House","Will MacLean","00","—","campus horror|Victorian mansion|dark secrets|students"),
+  T("To Bewitch a Hunter","Luciano Lamberti","00","—","Argentina|translated|Pet Sematary meets Tender Is the Flesh"),
+  ["Bad Words","Rioghnach Robinson","Literária","2026-10-06","St. Martin’s Press","debut|novelist vs. critic|brutal review|rivalry|literary romance","Goodreads Readers Choice"]
+];
+
+const ALL = B.concat(E, X, O);
+
+const AU = {
+  "The Witch": "Você leu 6 livros da Freida McFadden (média 3,8★)",
+  "The Gift": "Você leu 6 livros da Freida McFadden (média 3,8★)",
+  "The Last King of Faerie": "Você leu 9 livros da Cassandra Clare (média 3,3★)",
+  "Murmuration": "Você leu 4 livros do T.J. Klune (média 3,6★)",
+  "Monsters of Ohio": "Você leu Starter Villain de John Scalzi (4,0★)",
+  "A Conspiracy of Charming Monsters": "Você leu Holly Black (Cruel Prince)",
+  "Other Worlds Than These": "Você já leu Stephen King (média 4,0★)",
+  "Off the Reservation": "Você leu Stephen Graham Jones (média 3,5★)"
+};
+
+const YOU = ALL;
+
+let G = [];
+const S = { q: "", mon: "", g: new Set(), sort: "date", only: false, tab: "all", saved: new Set(), interest: "" };
+const INTEREST_KEY = "bookInterestV1", PROFILE_KEY = "readingProfileV1";
+let INTEREST = {};
+let PROFILE = null;
+try { INTEREST = JSON.parse(localStorage.getItem(INTEREST_KEY) || "{}"); } catch(e) {}
+try { PROFILE = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null"); } catch(e) {}
+const statusLabel = v => ({interested:"Tenho interesse", maybe:"Talvez", "not-interested":"Não tenho interesse"}[v] || "Ainda sem marcação");
+try { JSON.parse(localStorage.getItem("saved") || "[]").forEach(x => S.saved.add(x)); } catch(e){}
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fd = d => !/^\d{4}-\d{2}-\d{2}$/.test(String(d || "")) ? "Data não confirmada" : d.endsWith("-00") ? new Date(d.slice(0,8)+"01T00:00:00Z").toLocaleDateString("pt-BR",{month:"short",timeZone:"UTC"}) : new Date(d+"T00:00:00Z").toLocaleDateString("pt-BR",{day:"numeric",month:"short",timeZone:"UTC"});
+
+const grLink = (t, a) => `https://www.goodreads.com/search?q=${encodeURIComponent(t + " " + a.split(",")[0])}`;
+const amzLink = (t, a) => `https://www.amazon.com/s?k=${encodeURIComponent(t + " " + a.split(",")[0])}&i=stripbooks`;
+
+function src() { return S.tab === "you" ? YOU : ALL; }
+
+function parseCSV(text) {
+  const rows=[]; let row=[], field="", quoted=false;
+  for(let i=0;i<text.length;i++) { const c=text[i];
+    if(quoted) { if(c==='"' && text[i+1]==='"'){field+='"';i++;} else if(c==='"') quoted=false; else field+=c; }
+    else if(c==='"') quoted=true;
+    else if(c===","){row.push(field);field="";}
+    else if(c==="\n"){row.push(field.replace(/\r$/,""));rows.push(row);row=[];field="";}
+    else field+=c;
+  }
+  if(field.length || row.length){row.push(field.replace(/\r$/,""));rows.push(row);}
+  const headers=(rows.shift()||[]).map(h=>h.trim());
+  return rows.filter(r=>r.some(x=>x.trim())).map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||"").trim()])));
+}
+function makeProfile(rows) {
+  const authorStats={}, moodStats={}, paceStats={}, narrativeStats={}, devStats={}, warningStats={}, tagStats={};
+  const readRows=rows.filter(r=>(r["Read Status"]||"").toLowerCase()==="read");
+  const addStat=(bucket,key,rating)=>{ if(!key) return; key=key.trim().toLowerCase(); if(!key) return; if(!bucket[key]) bucket[key]={n:0,sum:0}; bucket[key].n++; if(Number.isFinite(rating)&&rating>0) bucket[key].sum+=rating; };
+  for(const r of readRows) {
+    const rating=Number(String(r["Star Rating"]||"").replace(",","."));
+    const author=(r.Authors||"").trim();
+    if(author && Number.isFinite(rating) && rating>0) {
+      const key=author.toLowerCase(); if(!authorStats[key]) authorStats[key]={name:author,n:0,sum:0};
+      authorStats[key].n++; authorStats[key].sum+=rating;
+    }
+    for(const raw of (r.Moods||"").split(",")) addStat(moodStats,raw,rating);
+    for(const raw of (r.Tags||"").split(/[,;|]/)) addStat(tagStats,raw,rating);
+    addStat(paceStats,r.Pace,rating);
+    addStat(narrativeStats,r["Character- or Plot-Driven?"],rating);
+    addStat(devStats,r["Strong Character Development?"],rating);
+    if((r["Content Warnings"]||"").trim()) addStat(warningStats,"has content warnings",rating);
+  }
+  const authors={}; Object.entries(authorStats).forEach(([k,v])=>authors[k]={name:v.name,n:v.n,avg:+(v.sum/v.n).toFixed(2)});
+  const summarize=bucket=>Object.fromEntries(Object.entries(bucket).map(([k,v])=>[k,{n:v.n,avg:v.n?+(v.sum/v.n).toFixed(2):0}]));
+  const liked=(bucket,min=2)=>Object.entries(bucket).filter(([k,v])=>v.n>=min&&v.avg>=3.8).sort((a,b)=>b[1].avg-a[1].avg).slice(0,8).map(([k])=>k);
+  const disliked=(bucket,min=2)=>Object.entries(bucket).filter(([k,v])=>v.n>=min&&v.avg>0&&v.avg<3.2).sort((a,b)=>a[1].avg-b[1].avg).slice(0,5).map(([k])=>k);
+  return {
+    readCount:readRows.length, ratedCount:readRows.filter(r=>Number(String(r["Star Rating"]||"").replace(",","."))>0).length,
+    authors,tags:summarize(tagStats),paces:summarize(paceStats),narrative:summarize(narrativeStats),characterDevelopment:summarize(devStats),
+    likedTags:liked(tagStats,1),dislikedTags:disliked(tagStats,1),
+    likedCharacterDevelopment:liked(devStats,3),createdAt:new Date().toISOString()
+  };
+}
+
+const GENRE_HINTS = {
+  "fantasia":"Fantasy", "romance":"Romance", "romantasy":"Romantasy", "thriller":"Thriller", "mystery":"Mystery", "horror":"Horror", "gothic":"Gothic", "historical":"Historical Fiction", "science fiction":"Science Fiction", "sci-fi":"Science Fiction", "literary":"Literary Fiction", "ya":"Young Adult", "young adult":"Young Adult", "nonfiction":"Nonfiction", "historical fiction":"Historical Fiction"
+};
+const KEYWORD_HINTS = [
+  [/witch|witchcraft|magic|spell|wizard|fae|fairy|dragon|curse|supernatural|ghost|vampire/i,"WITCHCRAFT & SUPERNATURAL"],
+  [/murder|crime|detective|investigat|mystery|trial|conspiracy|secret/i,"MURDER, MYSTERY & SECRETS"],
+  [/family|inheritance|ancestral|sister|mother|father|legacy/i,"FAMILY SECRETS & LEGACY"],
+  [/war|wwii|world war|politic|empire|kingdom|court|reign/i,"WAR & POLITICAL INTRIGUE"],
+  [/revenge|vengeful|rivalry|rival|betrayal/i,"REVENGE & RIVALRIES"],
+  [/time loop|time travel|dystopia|space|planet|future/i,"TIME LOOPS & ALTERNATE WORLDS"],
+  [/romance|love|relationship|sapphic|hockey romance|fake fling/i,"FORBIDDEN LOVE & RELATIONSHIPS"],
+  [/haunted|haunting|dark|gothic|body horror|eco-horror|folk horror/i,"DARK & GOTHIC ATMOSPHERE"],
+  [/school|campus|college|coming.of.age|young adult/i,"COMING OF AGE"],
+  [/music|film|cinema|artist|memoir|biography/i,"ART, MUSIC & MEMORY"],
+  [/weird fiction|surreal|bizarre|eldritch|ancient entity|sea god/i,"ELDRITCH & SURREAL HORROR"],
+  [/wolf|werewolf|shifter/i,"WEREWOLVES & SHAPESHIFTERS"]
+];
+function classifyBook(b) {
+  const raw=String(b[5]||"").replace(/[|_]/g," ");
+  const text=(raw+" "+b[2]).toLowerCase();
+  const genres=[];
+  Object.entries(GENRE_HINTS).forEach(([key,label])=>{if(text.includes(key)&&!genres.includes(label))genres.push(label)});
+  const base=GENRE_HINTS[String(b[2]||"").toLowerCase()]||String(b[2]||"").replace(/^(.)/,m=>m.toUpperCase());
+  if(base&&!genres.includes(base))genres.unshift(base);
+  const keywords=KEYWORD_HINTS.filter(([re])=>re.test(text)).map(([,label])=>label).slice(0,4);
+  // Keep source keywords in English; only show evidence supported by the catalog tags/title genre.
+  return {genres:[...new Set(genres)].slice(0,2),keywords,hasSourceTags:raw.trim().length>0};
+}
+
+function chips() {
+  G = [...new Set(src().map(b => b[2]))];
+  $("chips").innerHTML = G.map(g => `<button class="chip${S.g.has(g)?" on":""}" data-g="${esc(g)}">${esc(g)}</button>`).join("");
+}
+
+function recommendation(b) {
+  const author=String(b[1]||"").toLowerCase();
+  const meta=classifyBook(b);
+  const catalogText=(String(b[5]||"")+" "+String(b[2]||"")).toLowerCase().replace(/[|_]/g," ");
+  const feedback=INTEREST[`${b[0]}::${b[1]}`]||"";
+  let authorMatch=0, genreMatch=0, keywordMatch=0;
+  const reasons=[];
+  if(PROFILE) {
+    const matches=Object.entries(PROFILE.authors||{}).filter(([name])=>name&&author.includes(name));
+    if(matches.length) {
+      const best=matches.sort((a,b)=>b[1].avg-a[1].avg)[0][1];
+      authorMatch=Math.max(0,Math.min(100,((best.avg-1)/4)*100));
+      if(best.avg>=3.8) reasons.push(`Highly rated author in your reading history (${best.avg.toFixed(1)}/5)`);
+      else if(best.avg<3) reasons.push(`You rated this author lower on average (${best.avg.toFixed(1)}/5)`);
+    }
+    const likedTags=PROFILE.likedTags||[];
+    const dislikedTags=PROFILE.dislikedTags||[];
+    const tagHits=likedTags.filter(t=>catalogText.includes(t));
+    const tagMisses=dislikedTags.filter(t=>catalogText.includes(t));
+    if(likedTags.length) {
+      keywordMatch=Math.max(0,Math.min(100,(tagHits.length/Math.max(1,Math.min(3,likedTags.length)))*100));
+      if(tagHits.length) reasons.push(`Matches reading-history tags: ${tagHits.slice(0,3).join(", ")}`);
+      if(tagMisses.length) keywordMatch=Math.max(0,keywordMatch-tagMisses.length*20);
+    }
+    // Goodreads export has no dedicated genre field; only use genre evidence if its Tags contain it.
+    const genreTerms=Object.keys(GENRE_HINTS);
+    const historyGenres=likedTags.filter(t=>genreTerms.some(g=>t.includes(g)));
+    const genreHits=historyGenres.filter(t=>meta.genres.join(" ").toLowerCase().includes(t)||catalogText.includes(t));
+    if(historyGenres.length) {
+      genreMatch=genreHits.length?100:0;
+      if(genreHits.length) reasons.push(`Matches genres in your highly rated books`);
+    }
+  }
+  // Weighted score only uses available evidence; missing profile dimensions are not treated as a match.
+  const weights={author:40,genre:25,keywords:35};
+  const available=(PROFILE?((Object.keys(PROFILE.authors||{}).length?weights.author:0)+((PROFILE.likedTags||[]).some(t=>Object.keys(GENRE_HINTS).some(g=>t.includes(g)))?weights.genre:0)+((PROFILE.likedTags||[]).length?weights.keywords:0)):0);
+  let score=available?((authorMatch*weights.author)+(genreMatch*weights.genre)+(keywordMatch*weights.keywords))/available:0;
+  if(feedback==="interested") {score=Math.max(score,85);reasons.unshift("Marked as interested by you");}
+  if(feedback==="maybe") {score=Math.max(score,55);reasons.unshift("On your maybe list");}
+  if(feedback==="not-interested") score=0;
+  return {score:Math.round(score),reason:[...new Set(reasons)].slice(0,3),available,feedback};
+}
+
+function card(b) {
+  const k = b[0], on = S.saved.has(k);
+  const interestKey = `${b[0]}::${b[1]}`;
+  const interest = INTEREST[interestKey] || "";
+  const rec = recommendation(b);
+  const desc=classifyBook(b);
+  const source = b[6] || "Editora / Catálogo";
+
+  
+  return `<div class="card" data-key="${esc(b[0])}" data-a="${esc(b[1])}">
+    <div class="cvw">${esc(b[0][0])}</div>
+    <div class="b">
+      <div class="t">${esc(b[0])}</div>
+      <div class="a">${esc(b[1])}</div>
+      <div class="m">${fd(b[3])} · ${esc(b[4])}</div>
+      <div><span class="source-tag">Fonte: ${esc(source)}</span></div>
+      <div class="layers"><div class="layer">${[...desc.genres, ...desc.keywords].length ? [...desc.genres, ...desc.keywords].map(esc).join(" + ") : '<span class="unknown">Keywords not available</span>'}</div></div>
+      ${S.tab === "you" ? `<div class="match">${rec.available?`Compatibility: ${rec.score}%${rec.reason.length?" · "+esc(rec.reason.join(" · ")):""}`:"Import your reading history with Goodreads tags to calculate a reliable match."}</div>` : ""}
+      <div class="feedback"><label for="interest-${esc(encodeURIComponent(interestKey))}">Seu interesse</label><select id="interest-${esc(encodeURIComponent(interestKey))}" data-interest="${esc(interestKey)}"><option value="" ${!interest?"selected":""}>Ainda sem marcação</option><option value="interested" ${interest==="interested"?"selected":""}>Tenho interesse</option><option value="maybe" ${interest==="maybe"?"selected":""}>Talvez</option><option value="not-interested" ${interest==="not-interested"?"selected":""}>Não tenho interesse</option></select></div>
+      <div class="info"></div>
+      <div class="links">
+        <a href="${grLink(b[0], b[1])}" target="_blank" rel="noopener" class="btn-link">Goodreads</a>
+        <a href="${amzLink(b[0], b[1])}" target="_blank" rel="noopener" class="btn-link">Amazon</a>
+      </div>
+    </div>
+    <button class="h" data-k="${esc(k)}" aria-label="Salvar">${on ? "♥" : "♡"}</button>
+  </div>`;
+}
+
+function render() {
+  const q = S.q.trim().toLowerCase();
+  let r = src().filter(b => (S.tab !== "you" || recommendation(b).score >= 35 || !!INTEREST[`${b[0]}::${b[1]}`]) && 
+    (!S.mon || b[3].slice(5,7) === S.mon) &&
+    (!S.g.size || S.g.has(b[2])) &&
+    (!S.only || S.saved.has(b[0])) &&
+    (!S.interest || (S.interest === "unrated" ? !INTEREST[`${b[0]}::${b[1]}`] : INTEREST[`${b[0]}::${b[1]}`] === S.interest)) &&
+    (!q || q.split(/\s+/).every(w => (b.join(" ")).toLowerCase().includes(w)))
+  );
+  
+  const s = S.sort;
+  r.sort((a,b) => s === "title" ? a[0].localeCompare(b[0]) : s === "genre" ? a[2].localeCompare(b[2]) || a[3].localeCompare(b[3]) : S.tab === "you" ? recommendation(b).score - recommendation(a).score || a[3].localeCompare(b[3]) : a[3].localeCompare(b[3]) || a[0].localeCompare(b[0]));
+
+  $("cnt").textContent = r.length + " livro" + (r.length === 1 ? "" : "s");
+  if (!r.length) {
+    $("list").innerHTML = '<div class="empty">Nenhum livro encontrado.</div>';
+    return;
+  }
+  
+  let h = "", last = "";
+  r.forEach(b => {
+    if (s === "genre" && b[2] !== last) {
+      last = b[2];
+      h += `<h2>${esc(last)}</h2>`;
+    }
+    h += card(b);
+  });
+  $("list").innerHTML = h;
+  enrich();
+}
+
+$("q").addEventListener("input", e => { S.q = e.target.value; render(); });
+$("sort").addEventListener("change", e => { S.sort = e.target.value; render(); });
+$("saved").addEventListener("change", e => { S.only = e.target.value === "1"; render(); });
+$("interestFilter").addEventListener("change", e => { S.interest = e.target.value; render(); });
+$("list").addEventListener("change", e => {
+  const sel = e.target.closest("select[data-interest]");
+  if (!sel) return;
+  if (sel.value) INTEREST[sel.dataset.interest] = sel.value; else delete INTEREST[sel.dataset.interest];
+  try { localStorage.setItem(INTEREST_KEY, JSON.stringify(INTEREST)); } catch(x) {}
+  render();
+});
+$("historyFile").addEventListener("change", async e => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const rows = parseCSV(text);
+    PROFILE = makeProfile(rows);
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(PROFILE));
+    $("profileNote").textContent = `Perfil carregado localmente: ${PROFILE.readCount} livros lidos, ${PROFILE.ratedCount} avaliados e ${Object.keys(PROFILE.authors).length} autores analisados. A compatibilidade usa autor (40%), gênero (25%) e keywords (35%), conforme os dados disponíveis no CSV. O CSV não foi enviado a nenhum servidor.`;
+    render();
+  } catch(err) {
+    $("profileNote").textContent = "Não consegui ler esse CSV. Use a exportação padrão do Goodreads com cabeçalhos em inglês.";
+  }
+});
+$("clearHistory").addEventListener("click", () => {
+  PROFILE = null;
+  try { localStorage.removeItem(PROFILE_KEY); } catch(e) {}
+  $("profileNote").textContent = "Perfil importado removido deste navegador.";
+  render();
+});
+$("exportFeedback").addEventListener("click", () => {
+  const rows = [["Title","Author","Interest"], ...Object.entries(INTEREST).map(([k,v]) => { const i=k.lastIndexOf("::"); return [k.slice(0,i),k.slice(i+2),statusLabel(v)]; })];
+  const csv = rows.map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"})); a.download = "minhas-marcacoes-livros.csv"; a.click(); URL.revokeObjectURL(a.href);
+});
+$("chips").addEventListener("click", e => {
+  const g = e.target.dataset.g;
+  if (!g) return;
+  S.g.has(g) ? S.g.delete(g) : S.g.add(g);
+  chips(); render();
+});
+
+$("list").addEventListener("click", e => {
+  const k = e.target.closest('.h')?.dataset.k;
+  if (!k) return;
+  S.saved.has(k) ? S.saved.delete(k) : S.saved.add(k);
+  try { localStorage.setItem("saved", JSON.stringify([...S.saved])) } catch(x){}
+  render();
+});
+
+$("mon").addEventListener("change", e => { S.mon = e.target.value; render(); });
+$("tabs").addEventListener("click", e => {
+  const t = e.target.dataset.tab;
+  if (!t) return;
+  S.tab = t; S.g.clear();
+  document.querySelectorAll("#tabs .chip").forEach(c => c.classList.toggle("on", c.dataset.tab === t));
+  $("why").hidden = t !== "you";
+  chips(); render();
+});
+
+const CK = "gbcache8";
+let C = {};
+try { C = JSON.parse(localStorage.getItem(CK) || "{}"); } catch(e){}
+const saveC = () => { try { localStorage.setItem(CK, JSON.stringify(C)); } catch(e){} };
+const norm = t => t.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+function showCoverImage(container, url, title, onFailure) {
+  const img = new Image();
+  img.alt = `Capa de ${title}`;
+  img.loading = "lazy";
+  img.decoding = "async";
+  img.onload = () => {
+    if (!container.isConnected) return;
+    container.replaceChildren(img);
+  };
+  img.onerror = () => {
+    if (typeof onFailure === "function") onFailure();
+    else makeSvgCover(container, title);
+  };
+  img.src = url;
+}
+
+function paint(el, d, finalResult = false) {
+  const cv = el.querySelector(".cvw");
+  if (!cv) return;
+
+  // A imagem do Google Books tem prioridade. Se ainda não temos resultado,
+  // mostramos uma capa substituta enquanto a pesquisa acontece.
+  if (d.c) {
+    const current = cv.querySelector("img");
+    if (!current || current.src !== d.c) {
+      showCoverImage(cv, d.c, el.dataset.key, () => fallbackCover(cv, el.dataset.key, el.dataset.a));
+    }
+  } else if (finalResult) {
+    fallbackCover(cv, el.dataset.key, el.dataset.a);
+  } else if (!cv.querySelector("img") && !cv.querySelector("svg")) {
+    makeSvgCover(cv, el.dataset.key);
+  }
+
+  const bits = [];
+  if (d.p) bits.push(d.p + " págs.");
+  if (d.r) bits.push("★ " + d.r + (d.n ? " (" + d.n + ")" : "") + " no Google");
+  const info = el.querySelector(".info");
+  if (info) info.textContent = bits.join(" · ");
+}
+
+const coverLookups = new WeakMap();
+async function fallbackCover(container, title, author = "") {
+  if (!container || !container.isConnected) return;
+  // Evita repetir a mesma busca enquanto ela ainda está em andamento.
+  if (coverLookups.has(container)) return coverLookups.get(container);
+
+  const task = (async () => {
+    try {
+      const params = new URLSearchParams({
+        title: title.split(":")[0].replace(/\[.*?\]/g, "").trim(),
+        limit: "8",
+        fields: "title,author_name,cover_i,isbn"
+      });
+      if (author) params.set("author", author.split(",")[0].trim());
+      const response = await fetch("https://openlibrary.org/search.json?" + params.toString());
+      if (!response.ok) throw new Error("Open Library indisponível");
+      const data = await response.json();
+      const wantedTitle = norm(title.split(":")[0]);
+      const wantedAuthor = norm(author.split(",")[0]);
+      const docs = (data.docs || []).filter(x => x.cover_i);
+      docs.sort((a, b) => {
+        const score = x => {
+          const t = norm(x.title || "");
+          const authors = norm((x.author_name || []).join(" "));
+          return (t === wantedTitle ? 4 : t.startsWith(wantedTitle) || wantedTitle.startsWith(t) ? 2 : 0)
+            + (wantedAuthor && authors.includes(wantedAuthor) ? 3 : 0);
+        };
+        return score(b) - score(a);
+      });
+      if (docs.length && container.isConnected) {
+        const url = `https://covers.openlibrary.org/b/id/${docs[0].cover_i}-M.jpg`;
+        showCoverImage(container, url, title, () => makeSvgCover(container, title));
+      } else {
+        makeSvgCover(container, title);
+      }
+    } catch (e) {
+      makeSvgCover(container, title);
+    } finally {
+      coverLookups.delete(container);
+    }
+  })();
+  coverLookups.set(container, task);
+  return task;
+}
+
+function makeSvgCover(container, title) {
+  if (!container || !container.isConnected) return;
+  const initials = title.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+  container.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 72 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Capa indisponível: ${esc(title)}">
+    <rect width="100%" height="100%" fill="var(--chip)"/>
+    <rect x="4" y="4" width="64" height="100" fill="none" stroke="var(--bd)" stroke-width="1"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="var(--ac)" font-family="sans-serif" font-weight="bold" font-size="16">${esc(initials)}</text>
+  </svg>`;
+}
+
+const Q = [];
+let busy = 0, pause = 0;
+const MAX_ATTEMPTS = 3;
+
+async function look(el) {
+  const t = el.dataset.key, a = el.dataset.a;
+  const main = t.split(":")[0].replace(/\[.*?\]/g, "").trim();
+  const au = a.split(",")[0].trim();
+  const u = "https://www.googleapis.com/books/v1/volumes?printType=books&maxResults=8&q=" + encodeURIComponent('intitle:"' + main + '" inauthor:"' + au + '"');
+  const r = await fetch(u);
+  if (r.status === 429 || r.status === 503) {
+    pause = Date.now() + 30000;
+    throw new Error("limite temporário da API");
+  }
+  if (!r.ok) throw new Error("Google Books indisponível");
+  const j = await r.json(), n = norm(main), wantedAuthor = norm(au);
+  const candidates = (j.items || []).filter(x => x.volumeInfo);
+  candidates.sort((x, y) => {
+    const score = v => {
+      const title = norm(v.volumeInfo.title || "");
+      const authors = norm((v.volumeInfo.authors || []).join(" "));
+      return (title === n ? 4 : title.startsWith(n) || n.startsWith(title) ? 2 : 0)
+        + (wantedAuthor && authors.includes(wantedAuthor) ? 3 : 0)
+        + (v.volumeInfo.imageLinks ? 2 : 0);
+    };
+    return score(y) - score(x);
+  });
+  const it = candidates.find(x => {
+    const title = norm(x.volumeInfo.title || "");
+    return title === n || title.startsWith(n) || n.startsWith(title);
+  });
+  if (!it) return { x: Date.now(), negative: true };
+  const v = it.volumeInfo;
+  let im = v.imageLinks && (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail);
+  if (im) im = im.replace(/^http:\/\//i, "https://").replace(/&zoom=\d+/g, "&zoom=1");
+  return { c: im || "", p: v.pageCount || 0, r: v.averageRating || 0, n: v.ratingsCount || 0, x: Date.now(), negative: !im };
+}
+
+function pump() {
+  if (Date.now() < pause) {
+    setTimeout(pump, Math.max(500, pause - Date.now()));
+    return;
+  }
+  while (busy < 2 && Q.length) {
+    const job = Q.shift();
+    const el = job && job.el ? job.el : job;
+    const attempts = job && job.el ? job.attempts : 0;
+    if (!el || !el.isConnected) continue;
+    busy++;
+    look(el).then(d => {
+      C[el.dataset.key] = d;
+      saveC();
+      paint(el, d, true);
+    }).catch(() => {
+      if (attempts + 1 < MAX_ATTEMPTS && el.isConnected) {
+        Q.push({ el, attempts: attempts + 1 });
+        setTimeout(pump, 1000 * (attempts + 1));
+      } else {
+        paint(el, { x: Date.now() }, true);
+      }
+    }).finally(() => {
+      busy--;
+      setTimeout(pump, 250);
+    });
+  }
+}
+
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) {
+    io.unobserve(e.target);
+    Q.push({ el: e.target, attempts: 0 });
+    pump();
+  }
+}), { rootMargin: "300px" });
+
+function enrich() {
+  document.querySelectorAll(".card").forEach(el => {
+    const d = C[el.dataset.key];
+    // Resultados positivos podem ser reaproveitados; resultados negativos
+    // expiram mais cedo para permitir que capas recém-publicadas apareçam.
+    const freshFor = d && d.negative ? 6 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
+    if (d && Date.now() - (d.x || 0) < freshFor) {
+      paint(el, d, true);
+    } else {
+      paint(el, {}, false);
+      io.observe(el);
+    }
+  });
+}
+
+async function loadReleaseFeed() {
+  try {
+    // The Python collector writes feed.json. Keep releases.json support for older feeds.
+    let response = await fetch(`feed.json?v=${Date.now()}`, {cache:"no-store"});
+    if (!response.ok) response = await fetch(`releases.json?v=${Date.now()}`, {cache:"no-store"});
+    if (!response.ok) return;
+    const feed = await response.json();
+    const existing = new Map(ALL.map(b => [`${String(b[0]).trim().toLowerCase()}::${String(b[1] || "").trim().toLowerCase()}`, b]));
+    let added = 0, merged = 0;
+    for (const item of (feed.books || [])) {
+      // Current collector schema (objects) and legacy releases.json schema (arrays).
+      let b;
+      if (Array.isArray(item)) {
+        if (!item[0]) continue;
+        b = item;
+      } else {
+        if (!item || !item.title) continue;
+        const genre = (item.genres || []).join(" + ") || "Unclassified";
+        const tags = [...(item.genres || []), ...(item.keywords || [])].filter(Boolean).join("|");
+        const sources = (item.sources || []).map(x => x.name).filter(Boolean);
+        const source = [...new Set(sources.length ? sources : [item.source_name || "Release feed"])].join(" / ");
+        b = [item.title, item.author || "", genre, item.publication_date || "", item.publisher || "", tags, source];
+      }
+      const key = `${String(b[0]).trim().toLowerCase()}::${String(b[1] || "").trim().toLowerCase()}`;
+      if (existing.has(key)) {
+        const prior = existing.get(key);
+        const incomingSources = String(b[6] || "").split(" / ").filter(Boolean);
+        const priorSources = String(prior[6] || "").split(" / ").filter(Boolean);
+        prior[6] = [...new Set([...priorSources, ...incomingSources])].join(" / ") || "Catálogo";
+        const priorTags = String(prior[5] || "").split("|").filter(Boolean);
+        const incomingTags = String(b[5] || "").split("|").filter(Boolean);
+        prior[5] = [...new Set([...priorTags, ...incomingTags])].join("|");
+        merged++;
+        continue;
+      }
+      // Unknown dates are allowed, but remain visibly unconfirmed rather than invented.
+      ALL.push(b);
+      existing.set(key, b);
+      added++;
+    }
+    const updated = feed.updated_at || feed.updatedAt;
+    if (updated) $("profileNote").textContent += ` Feed automático atualizado em ${new Date(updated).toLocaleDateString("pt-BR")}; ${added} novos registros adicionados, ${merged} registros mesclados (${feed.books?.length || 0} no arquivo).`;
+  } catch(e) {
+    // Opening by file:// can block fetch. The local catalog remains available.
+  }
+}
+
+if (PROFILE) $("profileNote").textContent = `Perfil carregado neste navegador: ${PROFILE.readCount || "—"} livros lidos e ${PROFILE.ratedCount || 0} avaliados. O perfil usa autores e tags do CSV; a compatibilidade considera autor (40%), gênero (25%) e keywords (35%) quando disponíveis.`;
+loadReleaseFeed().finally(() => { chips(); render(); });
+</script>
+</body>
+</html>
